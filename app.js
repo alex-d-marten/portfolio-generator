@@ -1,67 +1,6 @@
-// const printProfileData = profileDataArr => {
-//     for(let i=0; i < profileDataArr.length; i++) {
-//         console.log(profileDataArr[i]);
-//     }
-
-//     console.log('================')
-
-//     // is the same as this...
-//     profileDataArr.forEach(profileItem => console.log(profileItem));
-// };
-
-// printProfileData(profileDataArgs);
 const inquirer = require('inquirer');
-const fs = require('fs');
 const generatePage = require('./src/page-template.js');
-
-// // Equivalent functions
-// // const userID = profileDataArgs[0];
-// // const github = profileDataArgs[1];
-// const pageHTML = generatePage(name, github)
-// // 
-
-
-
-const mockData = {
-    name: 'Alex',
-    github: 'alex-d-marten',
-    confirmAbout: true,
-    about: 'I like to code!',
-    projects: [
-        {
-            name: 'Got Hops',
-            description: 'Find local breweries.',
-            languages: ['JavaScript', 'HTML', 'CSS'],
-            link: 'https://github.com/scottrohrig/got-hops',
-            feature: true,
-            confirmAddProject: true
-        },
-        {
-            name: 'Password Generator',
-            description: 'Generate a random password.',
-            languages: ['JavaScript', 'HTML', 'CSS'],
-            link: 'https://github.com/alex-d-marten/password-generator',
-            feature: false,
-            confirmAddProject: true
-        },
-        {
-            name: 'Weather Dashboard',
-            description: 'Find local weather.',
-            languages: ['JavaScript', 'HTML', 'CSS'],
-            link: 'https://github.com/alex-d-marten/weather-dashboard',
-            feature: true,
-            confirmAddProject: true
-        },
-        {
-            name: 'Workday Scheduler',
-            description: 'Create a workday schedule.',
-            languages: ['JavaScript', 'HTML', 'CSS'],
-            link: 'https://github.com/alex-d-marten/workday-scheduler',
-            feature: false,
-            confirmAddProject: false
-        }
-    ]
-}
+const {writeFile, copyFile} = require('./utils/generate-site.js');
 
 const promptUser = () => {
     return inquirer.prompt([
@@ -191,20 +130,21 @@ Add a New Project
     });
 };
 
-// promptUser()
-//     .then(prompProject)
-//     .then(portfolioData => {
-//         const pageHTML = generatePage(portfolioData);
-
-//         fs.writeFile('./index.html', pageHTML, err => {
-//           if (err) throw new Error(err);
-
-//           console.log('Page created! Check out index.html in this directory to see it!');
-//         });
-//     });
-const pageHTML = generatePage(mockData);
-fs.writeFile('./index.html', pageHTML, err => {
-    if (err) throw err;
-
-    console.log('Portfolio complete! Check out index.html to see the output!');
-});
+promptUser()
+    .then(prompProject)
+    .then(portfolioData => {
+        return generatePage(portfolioData);
+    })
+    .then(pageHTML => {
+        return writeFile(pageHTML);
+    })
+    .then(writeFileResponse => {
+        console.log(writeFileResponse);
+        return copyFile();
+    })
+    .then(copyFileResponse => {
+        console.log(copyFileResponse);
+    })
+    .catch(err => {
+        console.log(err);
+    });
